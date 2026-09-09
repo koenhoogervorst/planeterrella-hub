@@ -7,7 +7,11 @@ De hub is gevuld met de inhoud van jullie eigen projectbestanden: 69 taken, 28 e
 21 bronnen, 12 onderzoeksvragen, 12 projectonderdelen, 15 documenten, 8 beslissingen
 en 21 risico's.
 
-**Online:** https://planeterrella-hub.koenhoogervorst2005.workers.dev
+**Online:** https://planeterella-werk.planeterella-info.com
+(reserveadres: https://planeterrella-hub.koenhoogervorst2005.workers.dev)
+
+Jullie werken alle vier in **dezelfde gegevens**: wat de een verandert, ziet de
+ander binnen een paar seconden verschijnen zonder de pagina te verversen.
 
 ---
 
@@ -15,11 +19,21 @@ en 21 risico's.
 
 **Optie 1 — open de website** (aanbevolen)
 
-https://planeterrella-hub.koenhoogervorst2005.workers.dev
+https://planeterella-werk.planeterella-info.com
 
-Werkt op elke computer en telefoon, zonder installatie. Let op: je gegevens staan in
-de browser waarmee je hem opent, niet op de server. Open je hem op je telefoon, dan
-begin je daar met de startgegevens. Uitwisselen gaat via de JSON-export.
+Werkt op elke computer en telefoon, zonder installatie en zonder inloggen. Alles wat
+je verandert staat meteen in de gedeelde database, dus je teamgenoten zien het direct.
+
+Zet rechtsboven één keer **wie je bent** (Teamlid 1 t/m 4). Dat wordt in je eigen
+browser onthouden en komt bij elke wijziging te staan, zodat jullie terug kunnen zien
+wie wat heeft gedaan.
+
+Naast die keuze staat een stip:
+
+| Stip | Betekenis |
+|---|---|
+| groen, "Live" | Verbonden. Je teamgenoten zien je wijzigingen meteen. |
+| rood, "Offline" | Geen verbinding. Je werk wordt in je eigen browser bewaard en later alsnog verstuurd. |
 
 **Optie 2 — dubbelklik `Start-Projecthub.cmd`** (offline werken)
 
@@ -131,30 +145,45 @@ Ze staan als taak én als risico in de hub.
 
 ## Hoe de gegevens bewaard worden
 
-Alles staat in **localStorage** van je browser, onder de sleutel `planeterrella-hub`.
-Er wordt automatisch opgeslagen, ongeveer een halve seconde nadat je iets verandert,
-en nog een keer als je het tabblad sluit.
+Er zijn twee lagen, en dat is met opzet.
 
-Waarom localStorage en geen IndexedDB of database:
+**1. De gedeelde database (Supabase).** Dit is de echte bron. Elk item — elke taak,
+bron, eis, beslissing — is één rij in de tabel `items`. Zodra jij iets verandert gaat
+alleen dát item naar de database, en krijgen de anderen het via een live verbinding
+binnen. Twee mensen die tegelijk aan verschillende taken werken zitten elkaar dus niet
+in de weg. Werken jullie per ongeluk allebei aan dezelfde taak, dan wint de laatste
+die opslaat.
 
-- de dataset is klein (ongeveer 120 kB) en er worden geen bestanden of afbeeldingen in bewaard;
-- localStorage werkt synchroon, wat een hoop complexiteit scheelt;
-- voor uitwisseling tussen laptops is er JSON-export en -import.
+**2. Je eigen browser (localStorage).** Daarnaast blijft alles ook lokaal staan, onder
+de sleutel `planeterrella-hub`. Valt het internet weg, dan kun je gewoon doorwerken:
+de hub schakelt naar "Offline" en probeert je wijzigingen opnieuw te versturen zodra
+je weer iets aanpast.
 
-Wat dat betekent in de praktijk:
+Verder geldt:
 
-- de gegevens blijven staan na vernieuwen en na opnieuw opstarten;
-- ze staan alleen in **die** browser op **die** computer;
-- werken jullie met vier personen, spreek dan af wie de hoofdversie bijhoudt en
-  wissel uit via **Instellingen → Alles exporteren / JSON importeren**;
-- in een privévenster kan de browser opslag blokkeren. De hub blijft dan werken maar
-  waarschuwt dat er niets bewaard blijft;
-- raakt de opgeslagen tekst beschadigd, dan merkt de hub dat bij het opstarten, zet de
-  beschadigde versie apart onder `planeterrella-hub-kapotte-data` en start met de
-  startgegevens. Je verliest dus nooit stilzwijgend je werk.
+- raakt de lokale kopie beschadigd, dan merkt de hub dat bij het opstarten, zet de
+  beschadigde versie apart onder `planeterrella-hub-kapotte-data` en begint opnieuw;
+- **Instellingen → Alles exporteren (JSON)** maakt een volledige reservekopie. Doe dat
+  af en toe: er is geen inlog, dus als iemand per ongeluk veel weggooit is dit je
+  vangnet;
+- **Startgegevens terugzetten** en **Alle inhoud wissen** werken op de gedeelde
+  database. Wat jij daar doet, doe je dus voor iedereen;
+- op de pagina's Taken en Bronnen kun je een **CSV** exporteren van precies wat je op
+  dat moment gefilterd hebt. Die opent direct in Excel.
 
-Naast JSON kun je op de pagina's Taken en Bronnen een **CSV** exporteren van precies
-wat je op dat moment gefilterd hebt. Die opent direct in Excel.
+### Let op: er zit geen slot op
+
+Er is bewust geen inlogscherm. Iedereen die de link kent kan alles lezen, aanpassen en
+verwijderen. De site staat wel op `noindex`, dus zoekmachines nemen hem niet op — hij
+is alleen te vinden voor wie het adres heeft.
+
+Wil je dat later dichtzetten, dan moeten twee dingen mee veranderen:
+
+1. in Supabase de policies op de tabel `items` (nu `using (true)`, dan
+   `using (auth.role() = 'authenticated')`);
+2. in de app een inlogscherm met Supabase Auth.
+
+De plek waar dat moet staat aangegeven in `src/data/supabase-config.js`.
 
 ---
 
@@ -166,6 +195,7 @@ planeterrella-hub/
 ├── Planeterrella-Projecthub.html   losse versie, alles in één bestand
 ├── index.html                      startpunt voor de dev-server
 ├── vite.config.js
+├── wrangler.jsonc                  Cloudflare: domein en publicatie
 ├── scripts/
 │   └── maak-losse-html.mjs         bouwt de losse HTML
 └── src/
@@ -177,6 +207,7 @@ planeterrella-hub/
     │   └── componenten.css         alle componentstijlen
     ├── data/
     │   ├── constanten.js           statussen, prioriteiten, types
+    │   ├── supabase-config.js      adres en sleutel van de gedeelde database
     │   └── seed/                   de projectinhoud uit jullie bestanden
     │       ├── basis.js            project, team, fases, categorieën
     │       ├── taken.js
@@ -194,6 +225,7 @@ planeterrella-hub/
     │   ├── schema.js               controleert en repareert ingelezen gegevens
     │   ├── statistiek.js           alle voortgangsberekeningen
     │   ├── zoeken.js               globale zoekfunctie
+    │   ├── synchronisatie.js       praten met de gedeelde database
     │   ├── bestanden.js            CSV, downloads, bestand inlezen
     │   └── id.js
     ├── store/
@@ -241,7 +273,12 @@ Handmatig en met scripts in de browser gecontroleerd:
 - taken zonder deadline, zonder verantwoordelijke, en twee taken met dezelfde naam;
 - 671 taken tegelijk: geen crash, tabel toont er 100 met een knop "toon meer";
 - lichte en donkere weergave, en de weergave op 375 px breed (telefoon);
-- de productieversie zoals `Start-Projecthub.cmd` hem serveert: opslaan en herladen werken.
+- de productieversie zoals `Start-Projecthub.cmd` hem serveert: opslaan en herladen werken;
+- **samenwerken in twee vensters tegelijk**: een taak toevoegen in het ene venster
+  verschijnt binnen enkele seconden in het andere, afvinken gaat de andere kant op
+  weer mee, verwijderen ook, en overal staat de juiste naam bij;
+- hetzelfde tussen de live website en een tweede computer, dus over het internet heen;
+- de teller in de zijbalk en alle percentages lopen bij zo'n wijziging vanzelf mee.
 
 Niet getest: of opslaan werkt wanneer je `Planeterrella-Projecthub.html` rechtstreeks
 van de schijf opent. Dat verschilt per browser en was in deze omgeving niet na te gaan —

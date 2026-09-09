@@ -1,4 +1,4 @@
-import { useContext, useEffect, useMemo, useReducer, useRef, useState } from 'react';
+import { useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 
 import { laadProject, bewaarProject, wisProject } from '../lib/opslag.js';
 import { maakStartdata } from '../data/seed/index.js';
@@ -6,6 +6,27 @@ import { normaliseerProject } from '../lib/schema.js';
 import { nieuwId } from '../lib/id.js';
 import { vandaagIso } from '../lib/datums.js';
 import { ProjectContext } from './context.js';
+import { heeftGedeeldeDatabase } from '../data/supabase-config.js';
+import {
+  haalAllesOp,
+  bepaalWijzigingen,
+  stuurWijzigingen,
+  vervangAllesInDatabase,
+  luisterNaarWijzigingen,
+  pasRemoteToe,
+} from '../lib/synchronisatie.js';
+
+/* Wie ben jij? Wordt per browser onthouden en bij elke wijziging meegestuurd,
+   zodat je teamgenoten zien wie wat deed. */
+const WIE_SLEUTEL = 'planeterrella-hub-wie';
+
+function leesWie() {
+  try {
+    return window.localStorage.getItem(WIE_SLEUTEL) || '';
+  } catch {
+    return '';
+  }
+}
 
 /* Voorvoegsels voor nieuwe id's per collectie. */
 const VOORVOEGSELS = {
@@ -22,12 +43,13 @@ const VOORVOEGSELS = {
 
 const MAX_ACTIVITEIT = 60;
 
-function metActiviteit(staat, tekst, soort = 'wijziging') {
+function metActiviteit(staat, tekst, doorWie = '', soort = 'wijziging') {
   if (!tekst) return staat.activiteit;
   const regel = {
     id: nieuwId('act'),
     tijd: new Date().toISOString(),
     tekst,
+    doorWie,
     soort,
   };
   return [regel, ...staat.activiteit].slice(0, MAX_ACTIVITEIT);
@@ -42,7 +64,7 @@ function reducer(staat, actie) {
       return {
         ...staat,
         [collectie]: [nieuw, ...lijst],
-        activiteit: metActiviteit(staat, omschrijving),
+        activiteit: metActiviteit(staat, omschrijving, actie.doorWie),
       };
     }
 
@@ -52,7 +74,7 @@ function reducer(staat, actie) {
       return {
         ...staat,
         [collectie]: lijst.map((item) => (item.id === id ? { ...item, ...wijziging } : item)),
-        activiteit: metActiviteit(staat, omschrijving),
+        activiteit: metActiviteit(staat, omschrijving, actie.doorWie),
       };
     }
 
@@ -109,7 +131,7 @@ function reducer(staat, actie) {
         }));
       }
 
-      overig.activiteit = metActiviteit(staat, omschrijving);
+      overig.activiteit = metActiviteit(staat, omschrijving, actie.doorWie);
       return overig;
     }
 
@@ -117,11 +139,16 @@ function reducer(staat, actie) {
       return {
         ...staat,
         project: { ...staat.project, ...actie.wijziging },
-        activiteit: metActiviteit(staat, 'Projectgegevens aangepast'),
+        activiteit: metActiviteit(staat, 'Projectgegevens aangepast', actie.doorWie),
       };
 
     case 'vervangAlles':
       return actie.data;
+
+    /* Een wijziging van een teamgenoot. Die heeft de bijbehorende
+       activiteitregel zelf al aangemaakt, dus hier voegen we er geen toe. */
+    case 'remoteToepassen':
+      return pasRemoteToe(staat, actie.wijziging);
 
     default:
       return staat;
@@ -135,8 +162,128 @@ export function ProjectProvider({ children }) {
   const [startMelding, setStartMelding] = useState(beginToestand.melding);
   const opslagWerkt = beginToestand.opslagWerkt;
 
-  /* Opslaan met een korte vertraging, zodat typen in een formulier niet bij
-     elke toetsaanslag naar localStorage schrijft. */
+  /* Wie ben jij? Alleen voor de leesbaarheid van de activiteitenlijst. */
+  const [wieBenIk, setWieBenIkStaat] = useState(leesWie);
+  const wieRef = useRef(wieBenIk);
+  wieRef.current = wieBenIk;
+
+  const setWieBenIk = useCallback((naam) => {
+    setWieBenIkStaat(naam);
+    try {
+      if (naam) window.localStorage.setItem(WIE_SLEUTEL, naam);
+      else window.localStorage.removeItem(WIE_SLEUTEL);
+    } catch {
+      /* niets aan te doen */
+    }
+  }, []);
+
+  /* Stand van de gedeelde database: 'uit' | 'laden' | 'verbonden' | 'offline' */
+  const [deelStatus, setDeelStatus] = useState(heeftGedeeldeDatabase ? 'laden' : 'uit');
+  const [deelFout, setDeelFout] = useState(null);
+
+  /* Wat we denken dat er in de database staat. Hier vergelijken we tegenaan om
+     te bepalen wat er verstuurd moet worden. */
+  const gesynct = useRef(null);
+  const eersteKeerGeladen = useRef(false);
+
+  /* ---- 1. Bij het opstarten alles ophalen ---- */
+  useEffect(() => {
+    if (!heeftGedeeldeDatabase) return undefined;
+    let afgebroken = false;
+
+    (async () => {
+      try {
+        const startdata = maakStartdata();
+        const { data, leeg } = await haalAllesOp(startdata);
+        if (afgebroken) return;
+
+        if (leeg) {
+          /* Eerste keer: de startgegevens in de database zetten. */
+          await vervangAllesInDatabase(startdata, wieRef.current);
+          gesynct.current = startdata;
+          dispatch({ type: 'vervangAlles', data: startdata });
+        } else {
+          const schoon = normaliseerProject(data, startdata);
+          gesynct.current = schoon;
+          dispatch({ type: 'vervangAlles', data: schoon });
+        }
+        eersteKeerGeladen.current = true;
+        setDeelStatus('verbonden');
+        setDeelFout(null);
+      } catch (fout) {
+        if (afgebroken) return;
+        /* Geen verbinding: doorwerken met wat lokaal bewaard is. */
+        setDeelStatus('offline');
+        setDeelFout(
+          'Geen verbinding met de gedeelde database. Je werkt nu alleen in deze browser; ' +
+            'wijzigingen worden pas gedeeld als de verbinding terug is.',
+        );
+      }
+    })();
+
+    return () => {
+      afgebroken = true;
+    };
+  }, []);
+
+  /* ---- 2. Meeluisteren naar wijzigingen van teamgenoten ---- */
+  useEffect(() => {
+    if (!heeftGedeeldeDatabase) return undefined;
+
+    const stop = luisterNaarWijzigingen(
+      (wijziging) => {
+        /* Ook de vergelijkingsbasis meenemen, anders zou een wijziging van een
+           ander jouw nog niet verstuurde wijziging als "ongedaan" zien. */
+        if (gesynct.current) gesynct.current = pasRemoteToe(gesynct.current, wijziging);
+        dispatch({ type: 'remoteToepassen', wijziging });
+      },
+      (status) => {
+        if (status === 'verbonden') {
+          setDeelStatus('verbonden');
+          setDeelFout(null);
+        } else if (status === 'fout' || status === 'verbroken') {
+          setDeelStatus('offline');
+        }
+      },
+    );
+
+    return stop;
+  }, []);
+
+  /* ---- 3. Eigen wijzigingen versturen ---- */
+  const bezig = useRef(false);
+  useEffect(() => {
+    if (!heeftGedeeldeDatabase || !eersteKeerGeladen.current || !gesynct.current) return undefined;
+
+    const timer = setTimeout(async () => {
+      if (bezig.current) return;
+      const basis = gesynct.current;
+      const wijzigingen = bepaalWijzigingen(basis, staat);
+      if (wijzigingen.upserts.length === 0 && wijzigingen.deletes.length === 0) return;
+
+      bezig.current = true;
+      try {
+        await stuurWijzigingen(wijzigingen, wieRef.current);
+        /* Alleen bij succes bijwerken; mislukt het, dan proberen we het bij de
+           volgende wijziging opnieuw met dezelfde basis. */
+        gesynct.current = staat;
+        setDeelStatus('verbonden');
+        setDeelFout(null);
+      } catch (fout) {
+        setDeelStatus('offline');
+        setDeelFout(
+          'Je laatste wijziging kon niet gedeeld worden. Hij staat wel in deze browser en wordt ' +
+            'opnieuw geprobeerd zodra je iets anders aanpast.',
+        );
+      } finally {
+        bezig.current = false;
+      }
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [staat]);
+
+  /* ---- 4. Altijd ook lokaal bewaren, als reservekopie en voor offline ---- */
   const timer = useRef(null);
   useEffect(() => {
     if (timer.current) clearTimeout(timer.current);
@@ -156,8 +303,8 @@ export function ProjectProvider({ children }) {
 
   /* Bij het sluiten van het tabblad meteen wegschrijven, zodat de laatste
      wijziging niet in de vertraging blijft hangen.
-     Kan de browser niets opslaan (privévenster, of het bestand rechtstreeks van
-     schijf geopend), dan waarschuwen we in plaats daarvan — anders zou het werk
+     Kan de browser niets opslaan (privevenster, of het bestand rechtstreeks van
+     schijf geopend), dan waarschuwen we in plaats daarvan - anders zou het werk
      zonder enige melding verdwijnen. */
   useEffect(() => {
     const bijAfsluiten = (e) => {
@@ -180,20 +327,22 @@ export function ProjectProvider({ children }) {
 
   const acties = useMemo(() => {
     const nu = () => new Date().toISOString();
+    /* Elke actie krijgt automatisch mee wie hem uitvoerde. */
+    const verzend = (actie) => dispatch({ ...actie, doorWie: wieRef.current });
 
     return {
       /* ---- algemeen ---- */
       toevoegen(collectie, item, omschrijving) {
-        dispatch({ type: 'toevoegen', collectie, item, omschrijving });
+        verzend({ type: 'toevoegen', collectie, item, omschrijving });
       },
       bijwerken(collectie, id, wijziging, omschrijving) {
-        dispatch({ type: 'bijwerken', collectie, id, wijziging, omschrijving });
+        verzend({ type: 'bijwerken', collectie, id, wijziging, omschrijving });
       },
       verwijderen(collectie, id, omschrijving) {
-        dispatch({ type: 'verwijderen', collectie, id, omschrijving });
+        verzend({ type: 'verwijderen', collectie, id, omschrijving });
       },
       projectBijwerken(wijziging) {
-        dispatch({ type: 'projectBijwerken', wijziging });
+        verzend({ type: 'projectBijwerken', wijziging });
       },
 
       /* ---- taken ---- */
@@ -216,7 +365,7 @@ export function ProjectProvider({ children }) {
           gewijzigd: nu(),
           afgerondOp: taak.status === 'klaar' ? vandaagIso() : '',
         };
-        dispatch({
+        verzend({
           type: 'toevoegen',
           collectie: 'taken',
           item: volledig,
@@ -228,7 +377,7 @@ export function ProjectProvider({ children }) {
         if (wijziging.status !== undefined) {
           compleet.afgerondOp = wijziging.status === 'klaar' ? vandaagIso() : '';
         }
-        dispatch({
+        verzend({
           type: 'bijwerken',
           collectie: 'taken',
           id,
@@ -237,7 +386,7 @@ export function ProjectProvider({ children }) {
         });
       },
       taakStatus(id, status, titel) {
-        dispatch({
+        verzend({
           type: 'bijwerken',
           collectie: 'taken',
           id,
@@ -253,40 +402,48 @@ export function ProjectProvider({ children }) {
         });
       },
 
-      /* ---- data beheren ---- */
+      /* ---- data beheren ----
+         Deze drie vervangen alles in een keer. Dat moet ook in de gedeelde
+         database gebeuren, anders zouden de oude rijen via realtime meteen
+         weer terugkomen. */
       allesVervangen(ruweData) {
         const schoon = normaliseerProject(ruweData, maakStartdata());
-        dispatch({ type: 'vervangAlles', data: schoon });
+        gesynct.current = schoon;
+        verzend({ type: 'vervangAlles', data: schoon });
+        if (heeftGedeeldeDatabase) vervangAllesInDatabase(schoon, wieRef.current).catch(() => {});
         return schoon;
       },
       terugNaarStart() {
         const start = maakStartdata();
-        dispatch({ type: 'vervangAlles', data: start });
+        gesynct.current = start;
+        verzend({ type: 'vervangAlles', data: start });
+        if (heeftGedeeldeDatabase) vervangAllesInDatabase(start, wieRef.current).catch(() => {});
       },
       allesLeegmaken() {
         const start = maakStartdata();
-        dispatch({
-          type: 'vervangAlles',
-          data: {
-            ...start,
-            taken: [],
-            bronnen: [],
-            onderzoeken: [],
-            eisen: [],
-            onderdelen: [],
-            documenten: [],
-            beslissingen: [],
-            risicos: [],
-            activiteit: [
-              {
-                id: nieuwId('act'),
-                tijd: new Date().toISOString(),
-                tekst: 'Alle inhoud gewist — lege hub',
-                soort: 'systeem',
-              },
-            ],
-          },
-        });
+        const leeg = {
+          ...start,
+          taken: [],
+          bronnen: [],
+          onderzoeken: [],
+          eisen: [],
+          onderdelen: [],
+          documenten: [],
+          beslissingen: [],
+          risicos: [],
+          activiteit: [
+            {
+              id: nieuwId('act'),
+              tijd: new Date().toISOString(),
+              tekst: 'Alle inhoud gewist — lege hub',
+              doorWie: wieRef.current,
+              soort: 'systeem',
+            },
+          ],
+        };
+        gesynct.current = leeg;
+        verzend({ type: 'vervangAlles', data: leeg });
+        if (heeftGedeeldeDatabase) vervangAllesInDatabase(leeg, wieRef.current).catch(() => {});
       },
       opslagWissen() {
         wisProject();
@@ -302,8 +459,14 @@ export function ProjectProvider({ children }) {
       opslagWerkt,
       startMelding,
       verbergStartMelding: () => setStartMelding(null),
+      /* Gedeelde database */
+      gedeeld: heeftGedeeldeDatabase,
+      deelStatus,
+      deelFout,
+      wieBenIk,
+      setWieBenIk,
     }),
-    [staat, acties, opslagFout, opslagWerkt, startMelding],
+    [staat, acties, opslagFout, opslagWerkt, startMelding, deelStatus, deelFout, wieBenIk, setWieBenIk],
   );
 
   return <ProjectContext.Provider value={waarde}>{children}</ProjectContext.Provider>;

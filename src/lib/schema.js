@@ -240,6 +240,7 @@ function leesActiviteit(a) {
     id: tekst(a.id),
     tijd: tijdstempel(a.tijd),
     tekst: tekst(a.tekst),
+    doorWie: tekst(a.doorWie),
     soort: tekst(a.soort) || 'wijziging',
   };
 }

@@ -2,6 +2,7 @@
 
 import { Icoon } from '../ui/Icoon.jsx';
 import { Knop } from '../ui/Basis.jsx';
+import { Deelstatus } from './Deelstatus.jsx';
 
 export const PAGINAS = [
   { id: 'dashboard', naam: 'Dashboard', icoon: 'dashboard', groep: 'Overzicht' },
@@ -107,6 +108,8 @@ export function Kopbalk({ titel, zoekterm, setZoekterm, opZoek, openMenu, thema,
           aria-label="Zoeken in het hele project"
         />
       </div>
+
+      <Deelstatus />
 
       <Knop
         soort="stil"

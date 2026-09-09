@@ -6,6 +6,19 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "planeterrella-hub",
   "compatibility_date": "2026-09-09",
+
+  // Het gratis reserveadres van Cloudflare blijft ook werken, naast het eigen
+  // domein. Handig als er ooit iets mis is met de DNS.
+  "workers_dev": true,
+
+  // Het eigen domein. Staat hier zodat het gekoppeld blijft bij elke publicatie
+  // en niet alleen in het Cloudflare-dashboard bestaat.
+  "routes": [
+    {
+      "pattern": "planeterella-werk.planeterella-info.com",
+      "custom_domain": true
+    }
+  ],
   "assets": {
     "directory": "./dist",
     // De hub gebruikt hash-navigatie (#taken), maar mocht iemand een diep pad

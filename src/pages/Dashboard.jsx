@@ -229,7 +229,11 @@ export function Dashboard({ gaNaar, opTaak }) {
             staat.activiteit.slice(0, 8).map((regel) => (
               <div key={regel.id} className="zoek-treffer" style={{ cursor: 'default' }}>
                 <span className="klein">{regel.tekst}</span>
-                <span className="mini dof">{relatieveTijd(regel.tijd)}</span>
+                <span className="mini dof">
+                  {regel.doorWie ? <span className="activiteit-wie">{regel.doorWie}</span> : null}
+                  {regel.doorWie ? ' · ' : ''}
+                  {relatieveTijd(regel.tijd)}
+                </span>
               </div>
             ))
           )}

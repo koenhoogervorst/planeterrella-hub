@@ -1212,3 +1212,96 @@
   background: var(--waarschuwing-vlak);
   color: var(--waarschuwing);
 }
+
+/* ---------- Status van de gedeelde database ---------- */
+
+.deelstatus {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 9px;
+  border-radius: 20px;
+  border: 1px solid var(--lijn);
+  background: var(--vlak-achtergrond);
+  font-size: var(--tekst-xs);
+  font-weight: 640;
+  color: var(--tekst-zacht);
+  white-space: nowrap;
+  cursor: default;
+}
+
+.deelstatus-stip {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.deelstatus-stip[data-pulseer='true'] {
+  box-shadow: 0 0 0 0 currentColor;
+  animation: deelstatus-puls 2.4s ease-out infinite;
+}
+
+@keyframes deelstatus-puls {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .deelstatus-stip[data-pulseer='true'] {
+    animation: none;
+  }
+}
+
+.deelstatus-wie {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 4px 2px 9px;
+  border-radius: 20px;
+  border: 1px solid var(--lijn);
+  background: var(--vlak-achtergrond);
+  color: var(--tekst-dof);
+}
+
+.deelstatus-keuze {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--tekst-zacht);
+  font-size: var(--tekst-xs);
+  font-weight: 640;
+  padding: 3px 6px 3px 0;
+  cursor: pointer;
+  max-width: 108px;
+}
+
+.deelstatus-keuze:focus-visible {
+  outline: 2px solid var(--accent);
+  border-radius: var(--rond-sm);
+}
+
+/* Op smalle schermen alleen de stip; de tekst kost daar te veel ruimte. */
+@media (max-width: 760px) {
+  .deelstatus-tekst {
+    display: none;
+  }
+  .deelstatus {
+    padding: 5px;
+  }
+  .deelstatus-wie {
+    display: none;
+  }
+}
+
+.activiteit-wie {
+  font-weight: 650;
+  color: var(--accent);
+}
