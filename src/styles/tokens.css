@@ -1,0 +1,196 @@
+/* Ontwerptokens — één plek voor kleur, ruimte, typografie en randen.
+   Pas hier iets aan en het verandert overal in de app. */
+
+:root {
+  color-scheme: light;
+
+  /* Vlakken en lijnen */
+  --vlak-achtergrond: #f4f5f7;
+  --vlak-kaart: #ffffff;
+  --vlak-verhoogd: #ffffff;
+  --vlak-gedempt: #eceef1;
+  --vlak-hover: #e6e9ed;
+  --lijn: #d8dce2;
+  --lijn-sterk: #bcc3cc;
+
+  /* Tekst */
+  --tekst: #16202c;
+  --tekst-zacht: #4d5a68;
+  --tekst-dof: #77828f;
+  --tekst-op-accent: #ffffff;
+
+  /* Accent — rustig indigo, past bij een technisch dashboard */
+  --accent: #3b5bdb;
+  --accent-sterk: #2f49b0;
+  --accent-zacht: #e7ebfb;
+  --accent-rand: #c3cdf4;
+
+  /* Statuskleuren */
+  --status-todo: #7a8794;
+  --status-todo-vlak: #eaedf0;
+  --status-bezig: #1c7ed6;
+  --status-bezig-vlak: #e2effc;
+  --status-wacht: #c2810b;
+  --status-wacht-vlak: #fbf1dc;
+  --status-klaar: #2b8a3e;
+  --status-klaar-vlak: #e3f3e6;
+
+  /* Prioriteiten */
+  --prio-laag: #6b7684;
+  --prio-laag-vlak: #eceef1;
+  --prio-normaal: #1c7ed6;
+  --prio-normaal-vlak: #e4effb;
+  --prio-hoog: #d9730d;
+  --prio-hoog-vlak: #fbedde;
+  --prio-kritiek: #c92a2a;
+  --prio-kritiek-vlak: #fbe4e4;
+
+  /* Signaal */
+  --gevaar: #c92a2a;
+  --gevaar-vlak: #fbe4e4;
+  --waarschuwing: #b4780a;
+  --waarschuwing-vlak: #fbf2dd;
+  --goed: #2b8a3e;
+  --goed-vlak: #e4f3e7;
+  --info: #1c7ed6;
+  --info-vlak: #e3effc;
+
+  /* Typografie */
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", "Segoe UI Mono", Menlo, Consolas, monospace;
+  --tekst-xs: 11px;
+  --tekst-sm: 12.5px;
+  --tekst-md: 14px;
+  --tekst-lg: 16px;
+  --tekst-xl: 20px;
+  --tekst-2xl: 26px;
+  --tekst-3xl: 34px;
+
+  /* Ruimte */
+  --r1: 4px;
+  --r2: 8px;
+  --r3: 12px;
+  --r4: 16px;
+  --r5: 24px;
+  --r6: 32px;
+  --r7: 48px;
+
+  /* Vorm */
+  --rond-sm: 4px;
+  --rond: 7px;
+  --rond-lg: 11px;
+  --schaduw-sm: 0 1px 2px rgba(16, 24, 40, 0.06), 0 1px 3px rgba(16, 24, 40, 0.05);
+  --schaduw: 0 4px 12px rgba(16, 24, 40, 0.08), 0 1px 3px rgba(16, 24, 40, 0.05);
+  --schaduw-lg: 0 16px 40px rgba(16, 24, 40, 0.16);
+
+  --zijbalk-breedte: 236px;
+  --kop-hoogte: 56px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-thema="licht"]) {
+    color-scheme: dark;
+
+    --vlak-achtergrond: #12161c;
+    --vlak-kaart: #191f27;
+    --vlak-verhoogd: #1f2732;
+    --vlak-gedempt: #222a35;
+    --vlak-hover: #2a333f;
+    --lijn: #2c3541;
+    --lijn-sterk: #3d4855;
+
+    --tekst: #e6ebf1;
+    --tekst-zacht: #a6b1bf;
+    --tekst-dof: #7b8695;
+    --tekst-op-accent: #ffffff;
+
+    --accent: #6f8ff0;
+    --accent-sterk: #8aa4f5;
+    --accent-zacht: #1e2740;
+    --accent-rand: #33406a;
+
+    --status-todo: #98a3b1;
+    --status-todo-vlak: #252d38;
+    --status-bezig: #62aef5;
+    --status-bezig-vlak: #16293c;
+    --status-wacht: #e0ac48;
+    --status-wacht-vlak: #322813;
+    --status-klaar: #63c876;
+    --status-klaar-vlak: #162c1c;
+
+    --prio-laag: #99a3b1;
+    --prio-laag-vlak: #252d38;
+    --prio-normaal: #62aef5;
+    --prio-normaal-vlak: #16293c;
+    --prio-hoog: #f0a35a;
+    --prio-hoog-vlak: #33230f;
+    --prio-kritiek: #f57070;
+    --prio-kritiek-vlak: #351718;
+
+    --gevaar: #f57070;
+    --gevaar-vlak: #351718;
+    --waarschuwing: #e0ac48;
+    --waarschuwing-vlak: #322813;
+    --goed: #63c876;
+    --goed-vlak: #162c1c;
+    --info: #62aef5;
+    --info-vlak: #16293c;
+
+    --schaduw-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --schaduw: 0 4px 14px rgba(0, 0, 0, 0.45);
+    --schaduw-lg: 0 18px 44px rgba(0, 0, 0, 0.6);
+  }
+}
+
+:root[data-thema="donker"] {
+  color-scheme: dark;
+
+  --vlak-achtergrond: #12161c;
+  --vlak-kaart: #191f27;
+  --vlak-verhoogd: #1f2732;
+  --vlak-gedempt: #222a35;
+  --vlak-hover: #2a333f;
+  --lijn: #2c3541;
+  --lijn-sterk: #3d4855;
+
+  --tekst: #e6ebf1;
+  --tekst-zacht: #a6b1bf;
+  --tekst-dof: #7b8695;
+  --tekst-op-accent: #ffffff;
+
+  --accent: #6f8ff0;
+  --accent-sterk: #8aa4f5;
+  --accent-zacht: #1e2740;
+  --accent-rand: #33406a;
+
+  --status-todo: #98a3b1;
+  --status-todo-vlak: #252d38;
+  --status-bezig: #62aef5;
+  --status-bezig-vlak: #16293c;
+  --status-wacht: #e0ac48;
+  --status-wacht-vlak: #322813;
+  --status-klaar: #63c876;
+  --status-klaar-vlak: #162c1c;
+
+  --prio-laag: #99a3b1;
+  --prio-laag-vlak: #252d38;
+  --prio-normaal: #62aef5;
+  --prio-normaal-vlak: #16293c;
+  --prio-hoog: #f0a35a;
+  --prio-hoog-vlak: #33230f;
+  --prio-kritiek: #f57070;
+  --prio-kritiek-vlak: #351718;
+
+  --gevaar: #f57070;
+  --gevaar-vlak: #351718;
+  --waarschuwing: #e0ac48;
+  --waarschuwing-vlak: #322813;
+  --goed: #63c876;
+  --goed-vlak: #162c1c;
+  --info: #62aef5;
+  --info-vlak: #16293c;
+
+  --schaduw-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --schaduw: 0 4px 14px rgba(0, 0, 0, 0.45);
+  --schaduw-lg: 0 18px 44px rgba(0, 0, 0, 0.6);
+}

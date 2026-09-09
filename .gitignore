@@ -1,0 +1,16 @@
+# Afhankelijkheden
+node_modules/
+
+# Bouwresultaten — worden op Cloudflare opnieuw gebouwd
+dist/
+
+# De losse HTML wordt gegenereerd uit dist/ (npm run bundel)
+Planeterrella-Projecthub.html
+
+# Cloudflare
+.wrangler/
+
+# Editor en systeem
+.DS_Store
+Thumbs.db
+*.log
