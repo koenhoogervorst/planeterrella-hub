@@ -7,11 +7,21 @@ De hub is gevuld met de inhoud van jullie eigen projectbestanden: 69 taken, 28 e
 21 bronnen, 12 onderzoeksvragen, 12 projectonderdelen, 15 documenten, 8 beslissingen
 en 21 risico's.
 
+**Online:** https://planeterrella-hub.koenhoogervorst2005.workers.dev
+
 ---
 
 ## Snel starten
 
-**Optie 1 — dubbelklik `Start-Projecthub.cmd`** (aanbevolen)
+**Optie 1 — open de website** (aanbevolen)
+
+https://planeterrella-hub.koenhoogervorst2005.workers.dev
+
+Werkt op elke computer en telefoon, zonder installatie. Let op: je gegevens staan in
+de browser waarmee je hem opent, niet op de server. Open je hem op je telefoon, dan
+begin je daar met de startgegevens. Uitwisselen gaat via de JSON-export.
+
+**Optie 2 — dubbelklik `Start-Projecthub.cmd`** (offline werken)
 
 De hub opent vanzelf in je browser op `http://localhost:5184`. De eerste keer duurt
 dat een halve minuut, daarna is het meteen klaar. Laat het zwarte venster openstaan
@@ -20,7 +30,7 @@ zolang je de hub gebruikt; sluiten stopt de hub.
 Hiervoor moet Node.js op de computer staan (eenmalig, via https://nodejs.org).
 Het startbestand controleert dat en zegt het als het ontbreekt.
 
-**Optie 2 — `Planeterrella-Projecthub.html` dubbelklikken**
+**Optie 3 — `Planeterrella-Projecthub.html` dubbelklikken**
 
 Eén los bestand met alles erin, handig om door te sturen of even te laten zien.
 
@@ -32,9 +42,9 @@ Eén los bestand met alles erin, handig om door te sturen of even te laten zien.
 >
 > Test het één keer: open het bestand, voeg een taak toe, sluit het tabblad en open
 > het opnieuw. Staat de taak er nog? Dan kun je deze versie gewoon gebruiken. Zo
-> niet, gebruik dan optie 1 — die werkt altijd.
+> niet, gebruik dan optie 1 of 2 — die werken altijd.
 
-**Optie 3 — met Node, om de code aan te passen**
+**Optie 4 — met Node, om de code aan te passen**
 
 ```
 npm install
@@ -50,6 +60,23 @@ Heb je iets aangepast en wil je een nieuwe losse HTML?
 npm run build
 npm run bundel
 ```
+
+## De website bijwerken
+
+De code staat in de privé-repository
+[koenhoogervorst/planeterrella-hub](https://github.com/koenhoogervorst/planeterrella-hub).
+De site draait op Cloudflare Workers.
+
+Iets aangepast en online zetten? Eén commando:
+
+```
+npm run publiceer
+```
+
+Dat bouwt de app en publiceert hem naar Cloudflare. Vergeet daarna niet je wijziging
+ook naar GitHub te pushen.
+
+---
 
 ## Waar staat wat?
 

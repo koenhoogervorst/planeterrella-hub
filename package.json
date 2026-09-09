@@ -8,7 +8,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "bundel": "node scripts/maak-losse-html.mjs"
+    "bundel": "node scripts/maak-losse-html.mjs",
+    "publiceer": "vite build && wrangler deploy"
   },
   "dependencies": {
     "react": "^19.2.0",

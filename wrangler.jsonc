@@ -1,0 +1,15 @@
+{
+  // Cloudflare-configuratie. De hub is een statische site: er draait geen
+  // servercode, alleen de gebouwde bestanden uit dist/.
+  //
+  // Opnieuw publiceren na een wijziging:  npm run publiceer
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "planeterrella-hub",
+  "compatibility_date": "2026-09-09",
+  "assets": {
+    "directory": "./dist",
+    // De hub gebruikt hash-navigatie (#taken), maar mocht iemand een diep pad
+    // openen, dan krijgt hij gewoon de app in plaats van een 404.
+    "not_found_handling": "single-page-application"
+  }
+}
