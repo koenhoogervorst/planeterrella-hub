@@ -3,7 +3,7 @@
 Projectomgeving voor de **Noorderlichtopstelling (Planeterrella)** — kerntaak P4-K4
 "Ontwerpt prototypen", Researchinstrumentmaker (crebo 25897), Leidse Instrumentmakers School.
 
-De hub is gevuld met de inhoud van jullie eigen projectbestanden: 69 taken, 28 eisen,
+De hub is gevuld met de inhoud van jullie eigen projectbestanden: 84 taken, 28 eisen,
 21 bronnen, 12 onderzoeksvragen, 12 projectonderdelen, 15 documenten, 8 beslissingen
 en 21 risico's.
 
@@ -98,7 +98,7 @@ ook naar GitHub te pushen.
 |---|---|
 | **Dashboard** | Waar staat het project nu: voortgang, deadlines, hoge prioriteit, aandachtspunten |
 | **Voortgang** | Alle cijfers per teamlid, per fase, per categorie en per prioriteit |
-| **Planning** | De acht projectfases in vier weergaven: takenlijst, kanban-bord, kalender, strokenplanning |
+| **Planning** | De acht projectfases in vier weergaven: takenlijst, kanban-bord, kalender met dagplanning, strokenplanning |
 | **Taken** | Toevoegen, aanpassen, afvinken, toewijzen, filteren, CSV exporteren |
 | **Team** | Wie doet wat. Hier vervang je "Teamlid 1" door jullie echte namen |
 | **Projectonderdelen** | De fysieke delen van de opstelling, met status, eisen, taken en bestanden |
@@ -110,6 +110,50 @@ ook naar GitHub te pushen.
 | **Beslissingen** | Besluitenlogboek: wat, waarom, door wie, met welke gevolgen |
 | **Zoeken** | Doorzoekt alles tegelijk |
 | **Instellingen** | Back-up maken, terugzetten, projectgegevens aanpassen |
+
+---
+
+## De dagplanning
+
+**Planning → Kalender** laat per dag zien wat er te doen is. Klik op een dag en je
+krijgt eronder per persoon drie stapels:
+
+| Stapel | Betekenis |
+|---|---|
+| **Moet vandaag af** | De deadline valt op deze dag. |
+| **Kun je aan werken** | Loopt, en er staat niets in de weg. |
+| **Wacht op ander werk** | Loopt, maar een andere taak moet eerst af. Erbij staat welke. |
+| **Begin alvast aan** | Je hebt vandaag niets staan omdat je voorligt. Dit zijn de eerstvolgende taken die je alvast kunt oppakken. |
+
+Elke taak heeft nu naast een deadline ook een **startdatum** ("Vanaf wanneer" in het
+taakformulier). Daardoor staat een taak niet alleen op zijn deadlinedag in de kalender,
+maar op elke dag dat je eraan kunt werken.
+
+De startdatums zijn berekend, niet uit jullie bestanden overgenomen: het werk van elke
+persoon is verdeeld over de schooldagen van zijn fase, waarbij een taak nooit begint
+voordat de taak waar hij op wacht ook begonnen is. Klopt een datum niet? Pas hem gewoon
+aan in het taakformulier.
+
+Boven de kalender kun je filteren op persoon. Ziet iemand een dag helemaal leeg, dan
+verschijnt er een waarschuwing zodat je het werk kunt herverdelen.
+
+### Wat er is aangepast om dit rond te krijgen
+
+De projectgroep bestaat uit drie personen. Toen het vierde teamlid uit de hub werd
+gehaald, stonden er veertien taken zonder verantwoordelijke. Die zijn verdeeld naar
+rol: elektronica en documentatie naar Teamlid 1, natuurkunde en metingen naar
+Teamlid 2, productie en assemblage naar Teamlid 3.
+
+Daarna bleven er nog periodes over waarin iemand niets te doen had — Teamlid 3 in
+september, Teamlid 2 in de laatste drie weken. Daar zijn vijftien taken voor
+toegevoegd, allemaal gemarkeerd als **voorstel**. Het is geen bezigheidswerk: elke
+taak is terug te voeren op een eis, een werkproces uit het examenportfolio of een open
+onderzoeksvraag. Denk aan het testplan, de assemblagehandleiding, het
+machinepark-overzicht voor de make-or-buy-afweging en de hoofdstukken van het
+eindverslag. Schrap of verplaats ze gerust.
+
+Het resultaat: over de 43 resterende schooldagen heeft geen van de drie een dag zonder
+werk. Gemiddeld lopen er 3 tot 4 taken tegelijk per persoon.
 
 ---
 
@@ -278,6 +322,10 @@ Handmatig en met scripts in de browser gecontroleerd:
   verschijnt binnen enkele seconden in het andere, afvinken gaat de andere kant op
   weer mee, verwijderen ook, en overal staat de juiste naam bij;
 - hetzelfde tussen de live website en een tweede computer, dus over het internet heen;
+- de dagplanning: dag kiezen, maand bladeren, filteren op persoon, een taak openen
+  vanuit het dagpaneel, en de knop Vandaag;
+- alle 43 resterende schooldagen nagerekend: geen enkele persoon heeft een dag zonder
+  werk of zonder iets om vooruit te pakken;
 - de teller in de zijbalk en alle percentages lopen bij zo'n wijziging vanzelf mee.
 
 Niet getest: of opslaan werkt wanneer je `Planeterrella-Projecthub.html` rechtstreeks

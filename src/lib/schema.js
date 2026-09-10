@@ -94,6 +94,14 @@ function leesCategorie(c, index) {
   };
 }
 
+/* Een startdatum ná de deadline slaat nergens op; die gooien we weg in plaats
+   van hem te laten staan, want anders lijkt een taak nooit te lopen. */
+function startNietNaDeadline(start, deadline) {
+  if (!start) return '';
+  if (deadline && start > deadline) return '';
+  return start;
+}
+
 function leesTaak(t) {
   const status = keuze(t.status, STATUS_IDS, 'todo');
   return {
@@ -105,6 +113,7 @@ function leesTaak(t) {
     toegewezenAan: tekst(t.toegewezenAan),
     prioriteit: keuze(t.prioriteit, PRIORITEIT_IDS, 'normaal'),
     status,
+    startdatum: startNietNaDeadline(datum(t.startdatum), datum(t.deadline)),
     deadline: datum(t.deadline),
     afhankelijkVan: lijstVanTekst(t.afhankelijkVan),
     herkomst: keuze(t.herkomst, OK_HERKOMST, 'eigen'),

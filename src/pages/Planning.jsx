@@ -188,10 +188,13 @@ export function Planning({ bewerkTaak, setBewerkTaak }) {
       ) : null}
 
       {weergave === 'kalender' ? (
-        <Kaart titel="Kalender">
+        <Kaart titel="Kalender en dagplanning">
           <Kalender
             taken={staat.taken}
             fases={staat.fases}
+            teamleden={staat.teamleden}
+            categorieen={staat.categorieen}
+            project={staat.project}
             onOpen={setBewerkTaak}
             beginDatum={vandaag < staat.project.startdatum ? staat.project.startdatum : vandaag}
           />

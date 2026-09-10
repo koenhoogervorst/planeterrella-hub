@@ -355,6 +355,7 @@ export function ProjectProvider({ children }) {
           toegewezenAan: '',
           prioriteit: 'normaal',
           status: 'todo',
+          startdatum: '',
           deadline: '',
           afhankelijkVan: [],
           herkomst: 'eigen',

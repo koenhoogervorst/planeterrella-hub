@@ -20,10 +20,13 @@ export const project = {
   einddatum: '2026-11-10',
 };
 
-/* Het plan van aanpak noemt drie projectleden (Koen, Davey, Daniel).
- * De hub is ingericht voor vier plekken. Teamlid 4 staat leeg omdat er in de
- * projectbestanden geen vierde persoon voorkomt — vul zelf de echte namen in
- * op de Team-pagina. De rolomschrijvingen komen wél uit het plan van aanpak. */
+/* Het plan van aanpak noemt drie projectleden. De rolomschrijvingen hieronder
+ * komen letterlijk uit hoofdstuk 2 van dat document. De namen zijn neutraal
+ * gehouden; vul ze in op de Team-pagina.
+ *
+ * Eerder stond hier een vierde plek. Die is eruit gehaald omdat de projectgroep
+ * uit drie personen bestaat: het werk dat daaraan hing is over deze drie
+ * verdeeld, naar rol. */
 export const teamleden = [
   {
     id: 'lid1',
@@ -48,14 +51,6 @@ export const teamleden = [
     kleur: '#c2810b',
     notities:
       'Rol uit het plan van aanpak (hoofdstuk 2): houdt overzicht over wat er gemaakt en samengebouwd moet worden, is leidend in onderzoek. Eigenaar van eis F8 (magneethoek 23,5°).',
-  },
-  {
-    id: 'lid4',
-    naam: 'Teamlid 4',
-    rol: 'Rol nog te bepalen',
-    kleur: '#9c36b5',
-    notities:
-      'LET OP: in de projectbestanden staan drie projectleden. Deze vierde plek is toegevoegd omdat de hub voor vier personen is ingericht. De taken die hier nu aan hangen zijn voorstellen — verdeel ze zelf opnieuw zodra de echte rolverdeling duidelijk is.',
   },
 ];
 

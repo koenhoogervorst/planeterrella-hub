@@ -16,6 +16,7 @@ const LEEG = {
   toegewezenAan: '',
   prioriteit: 'normaal',
   status: 'todo',
+  startdatum: '',
   deadline: '',
   afhankelijkVan: [],
   notities: '',
@@ -39,6 +40,7 @@ export function TaakFormulier({ open, taak, onSluit, onOpslaan, standaardFase = 
         toegewezenAan: taak.toegewezenAan || '',
         prioriteit: taak.prioriteit || 'normaal',
         status: taak.status || 'todo',
+        startdatum: taak.startdatum || '',
         deadline: taak.deadline || '',
         afhankelijkVan: taak.afhankelijkVan || [],
         notities: taak.notities || '',
@@ -61,6 +63,16 @@ export function TaakFormulier({ open, taak, onSluit, onOpslaan, standaardFase = 
     }
     if (waarden.deadline && !isDatum(waarden.deadline)) {
       nieuweFouten.deadline = 'Gebruik een geldige datum.';
+    }
+    if (waarden.startdatum && !isDatum(waarden.startdatum)) {
+      nieuweFouten.startdatum = 'Gebruik een geldige datum.';
+    }
+    if (
+      isDatum(waarden.startdatum) &&
+      isDatum(waarden.deadline) &&
+      waarden.startdatum > waarden.deadline
+    ) {
+      nieuweFouten.startdatum = 'De startdatum ligt na de deadline.';
     }
     if (Object.keys(nieuweFouten).length > 0) {
       setFouten(nieuweFouten);
@@ -140,6 +152,14 @@ export function TaakFormulier({ open, taak, onSluit, onOpslaan, standaardFase = 
           value={waarden.status}
           onChange={(e) => zet('status', e.target.value)}
           opties={STATUSSEN}
+        />
+        <Invoer
+          label="Vanaf wanneer"
+          type="date"
+          value={waarden.startdatum}
+          onChange={(e) => zet('startdatum', e.target.value)}
+          fout={fouten.startdatum}
+          hint="Leeg = vanaf het begin van de fase."
         />
         <Invoer
           label="Deadline"

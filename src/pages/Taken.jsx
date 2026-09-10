@@ -56,6 +56,7 @@ export function Taken({ bewerkTaak, setBewerkTaak }) {
       { label: 'Verantwoordelijke', waarde: (t) => staat.teamleden.find((l) => l.id === t.toegewezenAan)?.naam || '' },
       { label: 'Prioriteit', waarde: (t) => zoekOp(PRIORITEITEN, t.prioriteit)?.naam || t.prioriteit },
       { label: 'Status', waarde: (t) => zoekOp(STATUSSEN, t.status)?.naam || t.status },
+      { label: 'Vanaf', waarde: (t) => t.startdatum },
       { label: 'Deadline', waarde: (t) => t.deadline },
       { label: 'Afgerond op', waarde: (t) => t.afgerondOp },
       {

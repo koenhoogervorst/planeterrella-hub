@@ -773,21 +773,49 @@
   text-align: center;
 }
 
+/* De dagvakjes zijn knoppen: klikken kiest de dag voor het paneel eronder. */
 .kalender-cel {
   background: var(--vlak-kaart);
-  min-height: 86px;
+  min-height: 92px;
   padding: 5px 6px;
   display: flex;
   flex-direction: column;
   gap: 3px;
+  border: 0;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  position: relative;
+}
+
+.kalender-cel:hover {
+  background: var(--vlak-gedempt);
 }
 
 .kalender-cel[data-buiten="true"] {
   background: var(--vlak-gedempt);
+  opacity: 0.7;
+}
+
+.kalender-cel[data-weekend="true"] .kalender-datum {
+  color: var(--tekst-dof);
+  opacity: 0.65;
 }
 
 .kalender-cel[data-vandaag="true"] {
   box-shadow: inset 0 0 0 2px var(--accent);
+}
+
+.kalender-cel[data-gekozen="true"] {
+  background: var(--accent-zacht);
+  box-shadow: inset 0 0 0 2px var(--accent-sterk);
+}
+
+.kalender-kop {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .kalender-datum {
@@ -801,37 +829,157 @@
   color: var(--accent);
 }
 
+.kalender-deadlinestip {
+  margin-left: auto;
+  min-width: 15px;
+  height: 15px;
+  padding: 0 4px;
+  border-radius: 20px;
+  background: var(--gevaar);
+  color: #fff;
+  font-size: 9.5px;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+  font-variant-numeric: tabular-nums;
+}
+
 .kalender-item {
+  display: block;
   font-size: 10.5px;
   line-height: 1.3;
   padding: 2px 5px;
   border-radius: var(--rond-sm);
-  background: var(--accent-zacht);
-  color: var(--accent);
-  font-weight: 580;
-  border: 0;
-  text-align: left;
-  cursor: pointer;
+  background: var(--vlak-gedempt);
+  color: var(--tekst-zacht);
+  font-weight: 560;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   width: 100%;
 }
 
-.kalender-item[data-status="klaar"] {
-  background: var(--status-klaar-vlak);
-  color: var(--status-klaar);
-}
-
-.kalender-item[data-verlopen="true"] {
+.kalender-item[data-deadline="true"] {
   background: var(--gevaar-vlak);
   color: var(--gevaar);
+  font-weight: 640;
 }
 
 @media (max-width: 720px) {
   .kalender-cel {
-    min-height: 62px;
+    min-height: 64px;
   }
+  .kalender-item {
+    display: none;
+  }
+}
+
+/* ---------- Dagplanning onder de kalender ---------- */
+
+.dagraster {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: var(--r3);
+  align-items: start;
+}
+
+.dagkolom {
+  border: 1px solid var(--lijn);
+  border-radius: var(--rond-lg);
+  padding: var(--r3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--r3);
+  background: var(--vlak-kaart);
+  min-width: 0;
+}
+
+.dagkolom-kop {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding-bottom: var(--r2);
+  border-bottom: 1px solid var(--lijn);
+}
+
+.dagstapel {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.dagstapel-kop {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--tekst-xs);
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--tekst-dof);
+}
+
+.dagstapel[data-soort="deadline"] .dagstapel-kop {
+  color: var(--gevaar);
+}
+
+.dagstapel[data-soort="oppakken"] .dagstapel-kop {
+  color: var(--goed);
+}
+
+.dagstapel[data-soort="geblokkeerd"] .dagstapel-kop {
+  color: var(--waarschuwing);
+}
+
+.dagstapel[data-soort="vooruit"] .dagstapel-kop {
+  color: var(--info);
+}
+
+.dagstapel[data-soort="vooruit"] .dagtaak {
+  border-left: 3px dashed var(--info);
+}
+
+.dagtaak {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  padding: 7px 9px;
+  border: 1px solid var(--lijn);
+  border-radius: var(--rond);
+  background: var(--vlak-achtergrond);
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.dagtaak:hover {
+  background: var(--vlak-hover);
+  border-color: var(--lijn-sterk);
+}
+
+.dagtaak-titel {
+  font-size: var(--tekst-sm);
+  font-weight: 570;
+  line-height: 1.35;
+}
+
+.dagstapel[data-soort="deadline"] .dagtaak {
+  border-left: 3px solid var(--gevaar);
+}
+
+.dagstapel[data-soort="oppakken"] .dagtaak {
+  border-left: 3px solid var(--goed);
+}
+
+.dagstapel[data-soort="geblokkeerd"] .dagtaak {
+  border-left: 3px solid var(--waarschuwing);
+}
+
+.dagstapel[data-soort="afgerond"] .dagtaak .dagtaak-titel {
+  text-decoration: line-through;
+  color: var(--tekst-dof);
 }
 
 /* ---------- Strokenplanning ---------- */
